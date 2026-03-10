@@ -16,17 +16,47 @@
 import { getPostBotBaseApi } from "~config/config";
 
 export const listingApi = async(params) => {
-    const response = await fetch(`${getPostBotBaseApi()}/postbot/media/platform/listing`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-        body: JSON.stringify(params),
-      });
-      if (response.ok) {
-        const body = await response.json();
-        return body;
-      }
-      return null;
+    // 绕过后端API，直接返回默认平台列表
+    return {
+        data: {
+            list: [
+                {
+                    code: 'toutiao',
+                    name: '今日头条',
+                    icon: 'https://postbot.exmay.com/docs/images/platform/toutiao.svg',
+                    type: 'article'
+                },
+                {
+                    code: 'weibo',
+                    name: '微博',
+                    icon: 'https://postbot.exmay.com/docs/images/platform/weibo.svg',
+                    type: 'article'
+                },
+                {
+                    code: 'zhihu',
+                    name: '知乎',
+                    icon: 'https://postbot.exmay.com/docs/images/platform/zhihu.svg',
+                    type: 'article'
+                },
+                {
+                    code: 'weixin',
+                    name: '微信公众平台',
+                    icon: 'https://postbot.exmay.com/docs/images/platform/weixin.svg',
+                    type: 'article'
+                },
+                {
+                    code: 'bilibili',
+                    name: '哔哩哔哩',
+                    icon: 'https://postbot.exmay.com/docs/images/platform/bilibili.svg',
+                    type: 'article'
+                },
+                {
+                    code: 'xiaohongshu',
+                    name: '小红书',
+                    icon: 'https://postbot.exmay.com/docs/images/platform/xiaohongshu.svg',
+                    type: 'article'
+                }
+            ]
+        }
+    };
 }

@@ -131,6 +131,26 @@ export const handleMessage = async (request, sender, sendResponse) => {
                 isLogin: res?.data?.login,
             });
             break;
+        case 'openPublishPage':
+            console.log('openPublishPage called');
+            // 打开全页面发布界面
+            chrome.tabs.create({ 
+                url: chrome.runtime.getURL('sidepanel.html') 
+            }, (tab) => {
+                console.log('sidepanel.html opened', tab);
+                // 页面打开后，等待一段时间，然后触发发布流程
+                setTimeout(() => {
+                    console.log('sending autoPublish message to tab', tab.id);
+                    // 向新打开的标签页发送消息，触发发布流程
+                    chrome.tabs.sendMessage(tab.id, {
+                        action: 'autoPublish'
+                    }, (response) => {
+                        console.log('autoPublish response', response);
+                    });
+                }, 1000);
+            });
+            sendResponse({ success: true });
+            break;
         default:
             break;
     }

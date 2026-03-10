@@ -39,20 +39,47 @@ export const initContextMenusEvent = () => {
   });
 
   const handelSyncData = async (info, tab) => {
-
-    const res = await isLoginApi({});
-    console.log('res', res);
-    if (!res?.data?.login) {
-      chrome.tabs.sendMessage(tab.id, { action: "doLogin" }, (response) => {
-        console.log(response.data);  // 在这里处理返回的数据
-      });
-      return;
-    }
-
+    // 绕过登录检查，直接提取内容
     const url = info.linkUrl || info.frameUrl || info.pageUrl;
 
-    chrome.tabs.sendMessage(tab.id, { action: "previewContent", tabTitle: tab.title, tabUrl: url }, (response) => {
-      console.log(response.content);  // 在这里处理返回的网页内容
-    });
+    try {
+      chrome.tabs.sendMessage(tab.id, { action: "previewContent", tabTitle: tab.title, tabUrl: url }, (response) => {
+        if (chrome.runtime.lastError) {
+          console.error('Error sending message:', chrome.runtime.lastError);
+          // 尝试打开发布页面
+          chrome.tabs.create({ 
+            url: chrome.runtime.getURL('sidepanel.html') 
+          });
+          return;
+        }
+        
+        if (response && response.content) {
+          console.log('Content received:', response.content);
+          // 内容获取成功，打开发布页面
+          chrome.tabs.create({ 
+            url: chrome.runtime.getURL('sidepanel.html') 
+          }, (newTab) => {
+            // 页面打开后，等待一段时间，然后触发发布流程
+            setTimeout(() => {
+              chrome.tabs.sendMessage(newTab.id, {
+                action: 'autoPublish'
+              });
+            }, 1000);
+          });
+        } else {
+          console.error('No content received or response is undefined');
+          // 没有获取到内容，仍然打开发布页面
+          chrome.tabs.create({ 
+            url: chrome.runtime.getURL('sidepanel.html') 
+          });
+        }
+      });
+    } catch (error) {
+      console.error('Error in handelSyncData:', error);
+      // 发生错误时，仍然打开发布页面
+      chrome.tabs.create({ 
+        url: chrome.runtime.getURL('sidepanel.html') 
+      });
+    }
   }
 }

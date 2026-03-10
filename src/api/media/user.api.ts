@@ -16,32 +16,22 @@
 import { getPostBotBaseUrl } from "~config/config";
 
 export const isLoginApi = async(params) => {
-    const response = await fetch(`${getPostBotBaseUrl()}/exmay/api/ums/member/islogin`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-        body: JSON.stringify(params),
-      });
-      if (response.ok) {
-        const body = await response.json();
-        return body;
-      }
-      return null;
+    // 绕过登录限制，直接返回已登录状态
+    return {
+        data: {
+            login: true
+        }
+    };
 }
 
 export const userInfoApi = async(params) => {
-  const response = await fetch(`${getPostBotBaseUrl()}/exmay/api/member/center/info`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      credentials: 'include',
-    });
-    if (response.ok) {
-      const body = await response.json();
-      return body;
-    }
-    return null;
+    // 绕过登录限制，直接返回默认用户信息
+    return {
+        data: {
+            member: {
+                nickname: '测试用户',
+                avatar: ''
+            }
+        }
+    };
 }

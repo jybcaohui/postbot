@@ -14,31 +14,33 @@
  * limitations under the License.
  */
 <template>
-  <div></div>
+  <div style="width: 200px; padding: 16px; text-align: center;">
+    <h3 style="margin-bottom: 16px; color: #bd34fe;">PostBot 内容同步助手</h3>
+    <button 
+      style="
+        width: 100%;
+        padding: 8px 16px;
+        background-color: #bd34fe;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 14px;
+      "
+      @click="openFullPage"
+    >
+      打开全页面
+    </button>
+  </div>
 </template>
 
 <script lang="ts" setup>
-  import { ref, onMounted } from 'vue';
-  import { getPostBotBaseUrl } from '../config/config';
-  import { appSettings } from '../config/setting';
-
-  // import type { PlasmoCSConfig } from 'plasmo';
-
-  // export const config: PlasmoCSConfig = {
-  //   // matches: ["https://www.plasmo.com/*"]
-  // };
-
-  onMounted(() => {
-    // Load explore version setting and open the appropriate URL
-    chrome.storage.local.get('exploreVersionEnabled', (result) => {
-      // Update appSettings with saved value
-      if (result.exploreVersionEnabled !== undefined) {
-        appSettings.value.exploreVersionEnabled = result.exploreVersionEnabled;
-      }
-      // Now open the URL with the correct base URL
-      chrome.tabs.create({ url: `${getPostBotBaseUrl()}/exmay/postbot/media/publish` });
+  const openFullPage = () => {
+    // 打开一个新的标签页，加载sidepanel.html
+    chrome.tabs.create({ 
+      url: chrome.runtime.getURL('sidepanel.html') 
     });
-  });
+  };
 
 </script>
 

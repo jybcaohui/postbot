@@ -60,15 +60,8 @@ export default defineComponent({
 
     // 点击按钮时打开 Modal
     const handleClick = () => {
-      chrome.runtime.sendMessage({ type: 'request', action: 'checkLogin' }, (response) => {
-        console.log('response', response);
-        if (response.isLogin) {
-          state.isModalVisible = true;
-        } else {
-          window.open(`${getPostBotBaseUrl()}/exmay/postbot/media/publish`, '_blank');
-        }
-      });
-
+      // 绕过登录检查，直接显示模态框
+      state.isModalVisible = true;
     }
 
     // 关闭 Modal
@@ -77,21 +70,27 @@ export default defineComponent({
     }
 
     const onOk = () => {
+      console.log('onOk called');
+      console.log('contentData.value', contentData.value);
 
+      // 发送消息存储内容数据
       chrome.runtime.sendMessage({
         type: 'request',
         action: POSTBOT_ACTION.PUBLISH_SYNC_DATA,
         data: contentData.value,
+      }, (response) => {
+        console.log('PUBLISH_SYNC_DATA response', response);
       });
 
-      const newWindow = window.open(`${getPostBotBaseUrl()}/exmay/postbot/media/publish`, '_blank');
-      if (newWindow) {
-        newWindow.onload = () => {
-          console.log('同步数据');
-          contentData.value = null;
-        }
-      }
+      // 发送消息打开发布界面
+      chrome.runtime.sendMessage({
+        type: 'request',
+        action: 'openPublishPage'
+      }, (response) => {
+        console.log('openPublishPage response', response);
+      });
 
+      // 关闭模态框
       state.isModalVisible = false;
     }
 

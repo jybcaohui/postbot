@@ -29,7 +29,8 @@ export const handleMessage = (request, sender, sendResponse) => {
     let userInfo = {};
     switch (request.action) {
         case 'doLogin':
-            window.open(`${getPostBotBaseUrl()}/exmay/postbot/media/publish`, '_blank');
+            // 绕过登录，直接打开模态框
+            state.isModalVisible = true;
             sendResponse({});
             break;
         case 'getImages':

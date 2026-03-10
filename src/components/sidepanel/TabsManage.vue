@@ -35,14 +35,12 @@
                     <div>
                       <Empty description="你还没有进行中的同步任务" />
                     </div>
-                    <a :href="`${getPostBotBaseUrl()}/exmay/postbot/media/publish`">
                       <Button type="primary" shape="round" :size="size" style="background-color:#1AAD19;background-color: #bd34fe;" @click="onPlus">
                           <template #icon>
                           <PlusOutlined />
                           </template>
                           新建同步任务
                       </Button>
-                    </a>
                 </Space>
               </div>
               <TaskList />
@@ -106,8 +104,21 @@
     import { contentImages, content } from '~utils/content';
 
     import { getPostBotBaseUrl, config, saveExploreVersionSetting } from '~config/config';
+    
+    import { POSTBOT_ACTION } from '~message/postbot.action';
 
     const activeKey = ref('1');
+
+    // 监听自动发布消息
+    chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+        console.log('TabsManage received message', message);
+        if (message.action === 'autoPublish') {
+            console.log('autoPublish message received');
+            // 自动触发发布流程
+            openPublishPlatforms();
+            sendResponse({ success: true });
+        }
+    });
 
     import UserCard from './UserCard.vue';
     import TaskList from './TaskList.vue';
@@ -154,10 +165,52 @@
   // 处理模态框确认
   const handleOk = () => {
     if (newTask.value) {
-
+      // 这里可以添加任务名称的处理逻辑
     }
+    
+    // 打开发布平台选择界面
+    openPublishPlatforms();
+    
     newTask.value = ""
     isModalVisible.value = false
+  }
+  
+  // 打开平台选择界面
+  const openPublishPlatforms = () => {
+    // 获取所有平台列表
+    chrome.runtime.sendMessage({ 
+      type: 'request', 
+      action: POSTBOT_ACTION.PLATFORM_LIST, 
+      data: { type: 'article' } 
+    }, (response) => {
+      console.log('platforms', response.platforms);
+      
+      // 这里可以创建一个平台选择界面
+      // 为了演示，我们直接选择所有平台进行发布
+      const platformCodes = response.platforms.map(p => p.code);
+      
+      // 获取存储的内容数据
+      chrome.runtime.sendMessage({ 
+        type: 'request', 
+        action: POSTBOT_ACTION.PUBLISH_SYNC_CONTENT 
+      }, (contentData) => {
+        console.log('contentData', contentData);
+        
+        // 开始发布
+        chrome.runtime.sendMessage({ 
+          type: 'request', 
+          action: POSTBOT_ACTION.PUBLISH_NOW, 
+          data: {
+            mediaType: 'article',
+            platformCodes: platformCodes,
+            title: contentData?.title || '测试标题',
+            content: contentData?.content || '测试内容',
+            cover: contentData?.cover || [],
+            isAutoPublish: true
+          }
+        });
+      });
+    });
   }
   
   // 处理模态框取消
@@ -167,7 +220,8 @@
   }
 
   const onPlus = () => {
-    chrome.tabs.create({ url: `${getPostBotBaseUrl()}/exmay/postbot/media/publish` });
+    // 打开新建任务模态框
+    showModal();
   }
 
   const onShowSwitchChange = (checked) => {

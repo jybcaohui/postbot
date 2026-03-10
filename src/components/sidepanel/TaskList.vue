@@ -15,7 +15,7 @@
  */
 <template>
   <div>
-    <a-divider style="font-weight: bold;">历史任务</a-divider>
+    <Divider style="font-weight: bold;">历史任务</Divider>
     <List
       class="em-loadmore-list"
       :loading="initLoading"
@@ -28,7 +28,7 @@
           :style="{ textAlign: 'center', marginTop: '12px', height: '32px', lineHeight: '32px' }"
         >
           <Button v-if="state.hasNextPage" @click="onLoadMore">加载更多</Button>
-          <a-divider v-else>已加载全部</a-divider>
+          <Divider v-else>已加载全部</Divider>
         </div>
       </template>
       <template #renderItem="{ item }">
@@ -59,7 +59,7 @@
   <script lang="ts" setup>
   import { ref, reactive, onMounted, nextTick } from 'vue';
   import 'ant-design-vue/dist/reset.css';
-  import { List, Skeleton, Button, Avatar, ListItem, ListItemMeta } from 'ant-design-vue';
+  import { List, Skeleton, Button, Avatar, ListItem, ListItemMeta, Divider } from 'ant-design-vue';
   
   import iconUrl from "~assets/icon.png";
 

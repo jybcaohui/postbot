@@ -16,17 +16,12 @@
 import { getPostBotBaseApi } from "~config/config";
 
 export const updateApi = async(params) => {
-    const response = await fetch(`${getPostBotBaseApi()}/postbot/media/client/update`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-        body: JSON.stringify(params),
-      });
-      if (response.ok) {
-        const body = await response.json();
-        return body;
-      }
-      return null;
+    // 绕过后端API，直接返回更新检查结果
+    return {
+        data: {
+            update: false,
+            version: '1.1.10',
+            url: 'https://postbot.exmay.com'
+        }
+    };
 }
